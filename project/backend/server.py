@@ -1235,8 +1235,11 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 
 app.add_middleware(
     CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://my-jewellery.vercel.app"
+    ],
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
     allow_methods=["*"],
     allow_headers=["*"],
 )
