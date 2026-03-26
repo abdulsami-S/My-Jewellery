@@ -235,7 +235,7 @@ export default function ContactPage() {
                 className="btn-gold inline-block w-full text-center py-3 rounded-full"
                 data-testid="whatsapp-link"
               >
-                Chat on WhatsAppRemove-Item .gitmodules -Force
+                Chat on WhatsApp
               </a>
             </Card>
           </div>
