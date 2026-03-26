@@ -780,7 +780,7 @@ export default function OrganizerDashboard() {
         email,
         password,
       });
-      if (response.data.success) {
+      if (response.status === 200) {
         setIsLoggedIn(true);
         setMustChangePassword(response.data.must_change_password);
         toast.success("Login successful!");
