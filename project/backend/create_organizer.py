@@ -47,6 +47,7 @@ if not mongo_uri:
 
 print("Connecting to MongoDB...")
 client = MongoClient(mongo_uri, serverSelectionTimeoutMS=5000)
+print(client.list_database_names())
 try:
     # quick ping
     client.admin.command('ping')
@@ -55,7 +56,7 @@ except Exception as e:
     sys.exit(1)
 
 # default database name: try to infer from env or use 'test' / 'dgm'
-db_name = os.environ.get("MONGO_DB") or os.environ.get("DATABASE_NAME") or os.environ.get("DB_NAME") or None
+db_name = "jewellery"
 if not db_name:
     # try to parse DB from URI (mongodb://host:port/dbname)
     try:
@@ -69,7 +70,7 @@ if not db_name:
     db_name = input("Could not infer DB name. Enter the database name to use (e.g. 'dgm', 'default', press Enter to use 'dgm'): ").strip() or "dgm"
 
 print("Using database:", db_name)
-db = client[db_name]
+db = client["jewellery"]
 
 # Set organizer credentials here
 email = "dgm.jewellerss@gmail.com"

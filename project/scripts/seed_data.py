@@ -13,7 +13,7 @@ async def seed_database():
     db_name = os.environ.get('DB_NAME', 'test_database')
     
     client = AsyncIOMotorClient(mongo_url)
-    db = client[db_name]
+    db = client["jewellery"]
     
     print("Seeding database...")
     
