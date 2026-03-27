@@ -23,7 +23,7 @@ export default function WorkshopPage() {
     },
     {
       title: "Hallmarking & Certification",
-      description: "Every piece is BIS hallmarked, guaranteeing purity and authenticity for your peace of mind.",
+      description: "Every piece is hallmarked, guaranteeing purity and authenticity for your peace of mind.",
       image: "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?w=600"
     }
   ];
@@ -126,7 +126,7 @@ export default function WorkshopPage() {
               <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Shield className="w-8 h-8 text-amber-700" />
               </div>
-              <h3 className="text-xl font-semibold mb-2">BIS Hallmark Certified</h3>
+              <h3 className="text-xl font-semibold mb-2">Hallmark Certified</h3>
               <p className="text-gray-600">Every piece is certified for purity</p>
             </Card>
             

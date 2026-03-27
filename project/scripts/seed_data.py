@@ -94,7 +94,7 @@ async def seed_database():
         {
             "id": str(uuid.uuid4()),
             "name": "Men's Gold Chain",
-            "description": "Classic 22K gold chain for men. Strong and durable design perfect for everyday wear. BIS hallmarked.",
+            "description": "Classic 22K gold chain for men. Strong and durable design perfect for everyday wear. Hallmarked.",
             "metal_type": "Gold",
             "purity": "22K",
             "weight": 18.0,
@@ -250,7 +250,7 @@ async def seed_database():
             "id": str(uuid.uuid4()),
             "customer_name": "Rajesh Kumar",
             "rating": 5,
-            "review": "Excellent service and transparent pricing. The BIS hallmark gives complete peace of mind. Highly recommend DGM Gold Works for authentic jewellery.",
+            "review": "Excellent service and transparent pricing. The hallmark gives complete peace of mind. Highly recommend DGM Gold Works for authentic jewellery.",
             "product_type": "Gold Chain",
             "is_approved": True,
             "created_at": datetime.now(timezone.utc).isoformat()

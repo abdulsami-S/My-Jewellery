@@ -118,7 +118,7 @@ export default function AboutPage() {
             <Card className="p-8 bg-white shadow-lg">
               <h3 className="text-2xl font-bold mb-4 gold-text">Hallmark Certified</h3>
               <p className="text-gray-700 leading-relaxed">
-                Every piece of jewellery we create is BIS hallmarked, guaranteeing the purity and authenticity of precious metals. Your trust deserves nothing less than complete transparency.
+                Every piece of jewellery we create is hallmarked, guaranteeing the purity and authenticity of precious metals. Your trust deserves nothing less than complete transparency.
               </p>
             </Card>
 
