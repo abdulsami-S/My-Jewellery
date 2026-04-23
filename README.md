@@ -136,10 +136,29 @@ DB_NAME=jewellery
 ## 📸 Screenshots (I Will This Add Later)
 
 * Home Page
+ <img width="1470" height="836" alt="image" src="https://github.com/user-attachments/assets/63e97047-3076-476e-9701-f381db35da85" />
+
+
 * Organizer Login
+<img width="1470" height="835" alt="image" src="https://github.com/user-attachments/assets/532ae729-7a43-4904-8fe6-d657b2c29738" />
+
+ 
 * Dashboard
+ <img width="1470" height="834" alt="image" src="https://github.com/user-attachments/assets/9c6a6193-daf8-4309-8231-af95d91fcc1e" />
+
+
 * Product Listing
-* etc..
+ <img width="1470" height="837" alt="image" src="https://github.com/user-attachments/assets/98fc03e7-2ac9-49fa-b4ae-d46918f42193" />
+
+   
+* Metal Rates
+ <img width="1470" height="837" alt="image" src="https://github.com/user-attachments/assets/e5ac646f-17cb-40c1-8065-91fe44e0485c" />
+
+
+* Contact Page
+ <img width="1470" height="833" alt="image" src="https://github.com/user-attachments/assets/e08deb94-69c2-42f3-834e-3128ac26e372" />
+ 
+
 
 ---
 
