@@ -47,7 +47,7 @@
 
 ---
 
-## 🤔 What Is This? (For Non-Tech Users)
+## 🤔 What Is This?
 
 Think of this as a **digital showroom** for a jewellery shop:
 
@@ -298,10 +298,6 @@ This project was built to gain hands-on experience in full-stack web development
 
 **Abdul Sami**
 
-[![GitHub](https://img.shields.io/badge/GitHub-abdulsami--S-black?style=for-the-badge&logo=github)](https://github.com/abdulsami-S)
-
-*Crafted with ❤️ from Proddatur, Andhra Pradesh*
-
 </div>
 
 ---
@@ -311,7 +307,5 @@ This project was built to gain hands-on experience in full-stack web development
 ## ⭐ If You Like This Project
 
 **Give it a star on GitHub — it really helps!** ⭐
-
-*© 2026 SAM Gold Works. All rights reserved.*
 
 </div>
