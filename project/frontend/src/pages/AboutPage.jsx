@@ -37,14 +37,14 @@ export default function AboutPage() {
         <div className="absolute inset-0">
           <img 
             src="https://images.unsplash.com/photo-1610375461246-83df859d849d?w=1600" 
-            alt="DGM Gold Works" 
+            alt="SAM Gold Works" 
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/50"></div>
         </div>
         <div className="relative z-10 text-center text-white px-4">
           <h1 className="text-5xl lg:text-6xl font-bold mb-6">
-            About <span className="gold-shimmer">DGM Gold Works</span>
+            About <span className="gold-shimmer">SAM Gold Works</span>
           </h1>
           <p className="text-xl lg:text-2xl max-w-3xl mx-auto">
             Where Tradition Meets Elegance Since 1995
@@ -62,13 +62,13 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
                 <p>
-                  Founded in 1995 in the heart of Proddatur, Andhra Pradesh, DGM Gold Works began as a humble goldsmith workshop with a vision to create jewellery that tells stories.
+                  Founded in 1995 in the heart of Proddatur, Andhra Pradesh, SAM Gold Works began as a humble goldsmith workshop with a vision to create jewellery that tells stories.
                 </p>
                 <p>
                   Over three decades, we have grown from a small family business to a trusted name in luxury jewellery, yet we've never lost sight of our roots. Every piece that leaves our workshop carries the same dedication, precision, and passion that defined our very first creation.
                 </p>
                 <p>
-                  Today, DGM Gold Works stands as a testament to the enduring power of craftsmanship, quality, and customer trust. We are proud to serve generations of families, helping them celebrate life's most precious moments with jewellery that lasts forever.
+                  Today, SAM Gold Works stands as a testament to the enduring power of craftsmanship, quality, and customer trust. We are proud to serve generations of families, helping them celebrate life's most precious moments with jewellery that lasts forever.
                 </p>
               </div>
             </div>
@@ -111,7 +111,7 @@ export default function AboutPage() {
       <section className="py-20 px-4" data-testid="why-choose-us">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-4xl lg:text-5xl font-bold text-center mb-12">
-            Why Choose <span className="gold-text">DGM Gold Works</span>
+            Why Choose <span className="gold-text">SAM Gold Works</span>
           </h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

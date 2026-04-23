@@ -952,7 +952,7 @@ export default function OrganizerDashboard() {
         <Card className="p-8 w-full max-w-md bg-white shadow-2xl">
           <div className="text-center mb-6">
             <h1 className="text-3xl font-bold mb-2">
-              <span className="gold-text">DGM</span>{" "}
+              <span className="gold-text">SAM</span>{" "}
               <span className="maroon-text">Organizer</span>
             </h1>
             <p className="text-gray-600">Admin Dashboard Login</p>
@@ -1063,7 +1063,7 @@ export default function OrganizerDashboard() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-2xl font-bold">
-            <span className="gold-text">DGM</span> Dashboard
+            <span className="gold-text">SAM</span> Dashboard
           </h1>
           <Button
             variant="ghost"

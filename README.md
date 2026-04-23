@@ -133,7 +133,7 @@ DB_NAME=jewellery
 
 ---
 
-## 📸 Screenshots (I Will This Add Later)
+## 📸 Screenshots
 
 * Home Page
  <img width="1470" height="836" alt="image" src="https://github.com/user-attachments/assets/63e97047-3076-476e-9701-f381db35da85" />
@@ -153,17 +153,14 @@ DB_NAME=jewellery
    
 * Metal Rates
  <img width="1470" height="837" alt="image" src="https://github.com/user-attachments/assets/e5ac646f-17cb-40c1-8065-91fe44e0485c" />
+ <br>
 
-<!-- <br> -->
- 
  <img width="1470" height="836" alt="image" src="https://github.com/user-attachments/assets/05097341-3111-43c6-8970-f0b7f96845c9" />
 <br>
-
 
 * Contact Page
  <img width="1470" height="833" alt="image" src="https://github.com/user-attachments/assets/e08deb94-69c2-42f3-834e-3128ac26e372" />
  <br>
-
 
 ---
 

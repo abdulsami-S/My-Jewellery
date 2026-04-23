@@ -454,7 +454,7 @@
     
 #     # Send email notification
 #     email_body = f"""
-#     New Enquiry from DGM Gold Works Website
+#     New Enquiry from SAM Gold Works Website
     
 #     Name: {enquiry.name}
 #     Email: {enquiry.email}
@@ -1134,7 +1134,7 @@ async def create_enquiry(enquiry: EnquiryCreate):
     
     # Send email notification
     email_body = f"""
-    New Enquiry from DGM Gold Works Website
+    New Enquiry from SAM Gold Works Website
     
     Name: {enquiry.name}
     Email: {enquiry.email}
@@ -1245,7 +1245,7 @@ async def get_analytics():
 
 @api_router.get("/")
 async def root():
-    return {"message": "DGM Gold Works API"}
+    return {"message": "SAM Gold Works API"}
 
 # Include the router in the main app
 app.include_router(api_router)

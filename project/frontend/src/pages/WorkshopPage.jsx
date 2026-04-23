@@ -61,13 +61,13 @@ export default function WorkshopPage() {
                 <span className="gold-text">30 Years</span> of Excellence
               </h2>
               <p className="text-lg text-gray-700 mb-6 leading-relaxed">
-                Since 1995, DGM Gold Works has been a trusted name in Proddatur, Andhra Pradesh. What started as a small goldsmith workshop has grown into a legacy of craftsmanship, quality, and trust.
+                Since 1995, SAM Gold Works has been a trusted name in Proddatur, Andhra Pradesh. What started as a small goldsmith workshop has grown into a legacy of craftsmanship, quality, and trust.
               </p>
               <p className="text-lg text-gray-700 mb-6 leading-relaxed">
                 Our artisans bring decades of experience, combining time-honored techniques with modern innovations to create jewellery that stands the test of time.
               </p>
               <p className="text-lg text-gray-700 leading-relaxed">
-                Every piece that leaves our workshop carries the mark of authenticity, precision, and passion that defines DGM Gold Works.
+                Every piece that leaves our workshop carries the mark of authenticity, precision, and passion that defines SAM Gold Works.
               </p>
             </div>
             <div className="relative h-[500px] rounded-lg overflow-hidden shadow-2xl">

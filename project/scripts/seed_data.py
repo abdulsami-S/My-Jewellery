@@ -241,7 +241,7 @@ async def seed_database():
             "id": str(uuid.uuid4()),
             "customer_name": "Priya Sharma",
             "rating": 5,
-            "review": "Absolutely beautiful craftsmanship! The gold necklace I purchased for my wedding was stunning. DGM Gold Works has been our family's trusted jeweller for years.",
+            "review": "Absolutely beautiful craftsmanship! The gold necklace I purchased for my wedding was stunning. SAM Gold Works has been our family's trusted jeweller for years.",
             "product_type": "Gold Necklace",
             "is_approved": True,
             "created_at": datetime.now(timezone.utc).isoformat()
@@ -250,7 +250,7 @@ async def seed_database():
             "id": str(uuid.uuid4()),
             "customer_name": "Rajesh Kumar",
             "rating": 5,
-            "review": "Excellent service and transparent pricing. The hallmark gives complete peace of mind. Highly recommend DGM Gold Works for authentic jewellery.",
+            "review": "Excellent service and transparent pricing. The hallmark gives complete peace of mind. Highly recommend SAM Gold Works for authentic jewellery.",
             "product_type": "Gold Chain",
             "is_approved": True,
             "created_at": datetime.now(timezone.utc).isoformat()

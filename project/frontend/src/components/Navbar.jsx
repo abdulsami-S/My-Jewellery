@@ -24,8 +24,8 @@ export default function Navbar() {
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-3" data-testid="logo-link">
             <div className="text-2xl font-bold">
-              {/* <span className="gold-text">DGM</span> <span className="maroon-text">Gold Works</span> */}
-              <span className="gold-shimmer">DGM</span> <span className="maroon-animate">Gold Works</span> 
+              {/* <span className="gold-text">SAM</span> <span className="maroon-text">Gold Works</span> */}
+              <span className="gold-shimmer">SAM</span> <span className="maroon-animate">Gold Works</span> 
               {/* <span className="gold-shimmer">DGM Gold Works</span> */}
               </div>
           </Link>

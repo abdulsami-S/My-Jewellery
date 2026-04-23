@@ -11,7 +11,7 @@ export default function Footer() {
           {/* About */}
           <div>
             <h3 className="text-2xl font-bold mb-4">
-              <span className="text-amber-300">DGM</span> Gold Works
+              <span className="text-amber-300">SAM</span> Gold Works
             </h3>
             <p className="text-amber-100 mb-4">
               Crafting timeless treasures since 1995. Where tradition meets elegance.
@@ -70,7 +70,7 @@ export default function Footer() {
 
         <div className="border-t border-amber-700 mt-12 pt-8 text-center">
           <p className="text-amber-100">
-            &copy; {new Date().getFullYear()} DGM Gold Works. All rights reserved. | Hallmark Certified
+            &copy; {new Date().getFullYear()} SAM Gold Works. All rights reserved. | Hallmark Certified
           </p>
         </div>
       </div>
