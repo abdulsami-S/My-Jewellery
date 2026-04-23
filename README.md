@@ -81,42 +81,80 @@ Think of this as a **digital showroom** for a jewellery shop:
 | ⭐ **Testimonials** | Approve or reject customer reviews before they go live |
 | 📊 **Analytics** | See total products, enquiries, and bestsellers at a glance |
 
----
 
-## 🔄 How It Works — Workflow
+## 🧠 System Architecture & Workflow
 
-```
-👤 CUSTOMER VISITS WEBSITE
-        │
-        ▼
-┌───────────────────┐
-│   React Frontend  │  ◄── Vercel (auto-deployed)
-│  (Browser / App)  │
-└────────┬──────────┘
-         │ Sends API requests
-         ▼
-┌───────────────────┐
-│  FastAPI Backend  │  ◄── Railway (cloud server)
-│   (Python API)    │
-└────────┬──────────┘
-         │ Reads / writes data
-         ▼
-┌───────────────────┐
-│  MongoDB Atlas    │  ◄── Cloud database (always online)
-│   (Database)      │
-└───────────────────┘
+> Here is how data flows through **SAM Gold Works** to serve customers and the organizer.
 
-Price Calculation Flow:
-Metal Rate (₹/gram) × Weight (grams)
-        = Metal Value
-        + Making Charges (10%)
-        + GST on Metal (3%)
-        + GST on Making (5%)
-        ─────────────────────
-        = 💰 Final Price shown to customer
+```mermaid
+flowchart TD
+    A([👤 Customer / Organizer]) --> B[React Frontend\nVercel]
+
+    B -->|HTTP API Request| C[FastAPI Backend\nRailway]
+
+    C --> D{Request Type?}
+
+    D -->|Browse Products| E[(MongoDB Atlas\nproducts collection)]
+    D -->|Get Metal Rates| F[(MongoDB Atlas\nmetal_rates collection)]
+    D -->|Submit Enquiry| G[(MongoDB Atlas\nenquiries collection)]
+    D -->|Organizer Login| H{bcrypt\nPassword Check}
+
+    H -->|✅ Valid| I[Admin Dashboard\nAccess Granted]
+    H -->|❌ Invalid| J([🚫 Access Denied])
+
+    E --> K[Price Calculation Engine]
+    F --> K
+
+    K -->|Metal Value + Making\nCharges + GST| L[💰 Final Price]
+
+    L --> M[JSON Response]
+    G --> M
+    I --> M
+
+    M -->|Rendered in Browser| N([🖥️ UI shown to User])
 ```
 
 ---
+
+### ⚙️ How It Works — Step by Step
+
+1. **Customer visits the website** → The React frontend loads in their browser (hosted on Vercel)
+
+2. **Product data is fetched** → The frontend sends a request to the FastAPI backend (hosted on Railway)
+
+3. **Backend queries the database** → FastAPI talks to MongoDB Atlas (cloud database) to get products, metal rates, and testimonials
+
+4. **Price is calculated in real-time** → For every product:
+   ```
+   Metal Rate (₹/g)  ×  Weight (g)   =  Metal Value
+                                      +  Making Charges (10% of Metal Value)
+                                      +  GST on Metal   (3% of Metal Value)
+                                      +  GST on Making  (5% of Making Charges)
+                                      ─────────────────────────────────────
+                                      =  💰 Final Price shown to Customer
+   ```
+
+5. **Customer enquires** → Contact form or WhatsApp button sends the enquiry directly to the shop
+
+6. **Organizer logs in** → Password is verified using bcrypt (secure hashing). No plain-text passwords stored anywhere
+
+7. **Organizer manages content** → Admin can add/edit products, update today's metal rates, approve testimonials, and view enquiries — all changes reflect on the live site instantly
+
+---
+
+### 🔄 Deployment Pipeline
+
+```mermaid
+flowchart LR
+    A[👨‍💻 Developer\npushes code] -->|git push| B[GitHub\nRepository]
+    B -->|Auto-trigger| C[Vercel\nBuilds Frontend]
+    B -->|Auto-trigger| D[Railway\nRestarts Backend]
+    C -->|Live in ~2 min| E([🌐 my-jewellery.vercel.app])
+    D -->|Live in ~1 min| F([⚙️ jewellery-hub.up.railway.app])
+    E & F -->|Read/Write| G[(☁️ MongoDB Atlas\nCloud Database)]
+```
+
+
 
 ## 🛠️ Tech Stack
 
