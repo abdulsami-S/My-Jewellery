@@ -6,9 +6,10 @@ A modern full-stack web application designed to showcase jewellery products with
 
 ## 🌐 Live Demo
 
+🔗 https://my-jewellery.vercel.app 
+
 🔗 https://jewellery-hub.up.railway.app
 
-🔗 https://my-jewellery.vercel.app
 
 ---
 
