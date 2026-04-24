@@ -81,6 +81,15 @@ Think of this as a **digital showroom** for a jewellery shop:
 | ⭐ **Testimonials** | Approve or reject customer reviews before they go live |
 | 📊 **Analytics** | See total products, enquiries, and bestsellers at a glance |
 
+### Backend Architecture & Security
+| Feature | Description |
+|---------|-------------|
+| 🛡️ **Rate Limiting** | SlowAPI prevents abuse by throttling login (5/min) and enquiries (10/min) |
+| 🔐 **JWT Auth** | Stateless, secure admin authentication with token validation |
+| ✅ **Data Validation** | Strict Pydantic models ensure all API requests and responses are 100% type-safe |
+| 🧪 **Test Suite** | Comprehensive Pytest suite with fully mocked MongoDB database operations |
+| 🔄 **CI/CD Pipeline** | GitHub Actions automatically runs tests and build checks on every push |
+
 
 ## 🧠 System Architecture & Workflow
 
@@ -90,7 +99,9 @@ Think of this as a **digital showroom** for a jewellery shop:
 flowchart TD
     A([👤 Customer / Organizer]) --> B[React Frontend\nVercel]
 
-    B -->|HTTP API Request| C[FastAPI Backend\nRailway]
+    B -->|HTTP API Request| RL{SlowAPI\nRate Limiter}
+    RL -->|Limit Exceeded| RL_R([🚫 429 Too Many Requests])
+    RL -->|Allowed| C[FastAPI Backend\nRailway]
 
     C --> D{Request Type?}
 
@@ -98,9 +109,13 @@ flowchart TD
     D -->|Get Metal Rates| F[(MongoDB Atlas\nmetal_rates collection)]
     D -->|Submit Enquiry| G[(MongoDB Atlas\nenquiries collection)]
     D -->|Organizer Login| H{bcrypt\nPassword Check}
+    D -->|Admin Action| JWT{JWT Auth\nValidation}
 
-    H -->|✅ Valid| I[Admin Dashboard\nAccess Granted]
-    H -->|❌ Invalid| J([🚫 Access Denied])
+    JWT -->|✅ Valid Token| ADM[Execute Admin Action]
+    JWT -->|❌ Invalid Token| J([🚫 401 Unauthorized])
+
+    H -->|✅ Valid| I[Return JWT Access Token]
+    H -->|❌ Invalid| J
 
     E --> K[Price Calculation Engine]
     F --> K
@@ -110,6 +125,7 @@ flowchart TD
     L --> M[JSON Response]
     G --> M
     I --> M
+    ADM --> M
 
     M -->|Rendered in Browser| N([🖥️ UI shown to User])
 ```
@@ -136,9 +152,11 @@ flowchart TD
 
 5. **Customer enquires** → Contact form or WhatsApp button sends the enquiry directly to the shop
 
-6. **Organizer logs in** → Password is verified using bcrypt (secure hashing). No plain-text passwords stored anywhere
+6. **Organizer logs in** → Password is verified using bcrypt. If correct, a JWT (JSON Web Token) is generated and stored securely in the browser.
 
-7. **Organizer manages content** → Admin can add/edit products, update today's metal rates, approve testimonials, and view enquiries — all changes reflect on the live site instantly
+7. **Organizer manages content** → Admin requests include the JWT token. The backend verifies the token and allows add/edit products, updating rates, and viewing enquiries.
+
+8. **Rate Limiting** → SlowAPI prevents abuse by limiting login attempts (5/min) and enquiry submissions (10/min) per IP address.
 
 ---
 
@@ -147,8 +165,15 @@ flowchart TD
 ```mermaid
 flowchart LR
     A[👨‍💻 Developer\npushes code] -->|git push| B[GitHub\nRepository]
-    B -->|Auto-trigger| C[Vercel\nBuilds Frontend]
-    B -->|Auto-trigger| D[Railway\nRestarts Backend]
+    
+    B -->|Auto-trigger| CI[GitHub Actions\nCI Pipeline]
+    
+    CI -->|🧪 12 Pytest Checks| CI_TEST{Tests Pass?}
+    CI_TEST -->|❌ Fail| CI_STOP([🚫 Block Deployment])
+    
+    CI_TEST -->|✅ Pass| C[Vercel\nBuilds Frontend]
+    CI_TEST -->|✅ Pass| D[Railway\nRestarts Backend]
+    
     C -->|Live in ~2 min| E([🌐 my-jewellery.vercel.app])
     D -->|Live in ~1 min| F([⚙️ jewellery-hub.up.railway.app])
     E & F -->|Read/Write| G[(☁️ MongoDB Atlas\nCloud Database)]
@@ -176,9 +201,13 @@ flowchart LR
 ```
 My-Jewellery/
 │
+├── 📁 .github/workflows/
+│   └── ci.yml                 ← GitHub Actions CI/CD pipeline
+│
 ├── 📁 project/
 │   │
 │   ├── 📁 backend/
+│   │   ├── 📁 tests/          ← Pytest suite with database mocks
 │   │   ├── server.py          ← Main API server (all routes & logic)
 │   │   ├── create_organizer.py ← Script to create admin account
 │   │   ├── requirements.txt   ← Python dependencies
@@ -246,6 +275,13 @@ npm start
 # Website running at http://localhost:3000
 ```
 
+### Step 4 — Run Backend Tests
+```bash
+cd ../backend
+python -m pytest tests/
+# Runs all 12 tests using an isolated, mocked database
+```
+
 ---
 
 ## 📡 Key API Endpoints
@@ -281,8 +317,10 @@ npm start
 - ✅ How to design REST APIs with FastAPI and connect to MongoDB
 - ✅ How to implement secure authentication with bcrypt password hashing
 - ✅ How to calculate real-world jewellery pricing (metal rates + GST)
+- ✅ How to write automated Pytest suites with completely mocked database connections
+- ✅ How to protect APIs using Rate Limiting and strict Pydantic schema validation
 - ✅ How to debug deployment issues between local and production environments
-- ✅ How Vercel and Railway continuous deployment pipelines work
+- ✅ How GitHub Actions, Vercel, and Railway continuous deployment pipelines work
 
 ---
 
