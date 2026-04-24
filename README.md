@@ -24,24 +24,24 @@
     <td align="center"><b>💍 Collections</b></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/63e97047-3076-476e-9701-f381db35da85" width="480"/></td>
-    <td><img src="https://github.com/user-attachments/assets/98fc03e7-2ac9-49fa-b4ae-d46918f42193" width="480"/></td>
+    <td><img src="https://raw.githubusercontent.com/abdulsami-S/My-Jewellery/main/assets/screenshots/home.png" width="480"/></td>
+    <td><img src="https://raw.githubusercontent.com/abdulsami-S/My-Jewellery/main/assets/screenshots/collection.png" width="480"/></td>
   </tr>
   <tr>
     <td align="center"><b>📊 Metal Rates</b></td>
     <td align="center"><b>📬 Contact Page</b></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/e5ac646f-17cb-40c1-8065-91fe44e0485c" width="480"/></td>
-    <td><img src="https://github.com/user-attachments/assets/e08deb94-69c2-42f3-834e-3128ac26e372" width="480"/></td>
+    <td><img src="https://raw.githubusercontent.com/abdulsami-S/My-Jewellery/main/assets/screenshots/metal.png" width="480"/></td>
+    <td><img src="https://raw.githubusercontent.com/abdulsami-S/My-Jewellery/main/assets/screenshots/contact.png" width="480"/></td>
   </tr>
   <tr>
     <td align="center"><b>🔐 Organizer Login</b></td>
     <td align="center"><b>🛠️ Admin Dashboard</b></td>
   </tr>
   <tr>
-    <td><img src="https://github.com/user-attachments/assets/532ae729-7a43-4904-8fe6-d657b2c29738" width="480"/></td>
-    <td><img src="https://github.com/user-attachments/assets/9c6a6193-daf8-4309-8231-af95d91fcc1e" width="480"/></td>
+    <td><img src="https://raw.githubusercontent.com/abdulsami-S/My-Jewellery/main/assets/screenshots/login.png" width="480"/></td>
+    <td><img src="https://raw.githubusercontent.com/abdulsami-S/My-Jewellery/main/assets/screenshots/admin.png" width="480"/></td>
   </tr>
 </table>
 
@@ -225,7 +225,7 @@ DB_NAME=jewellery
 
 Start the backend server:
 ```bash
-python server.py
+uvicorn server:app --reload
 # API running at http://localhost:8000
 ```
 
