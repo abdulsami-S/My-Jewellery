@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 # from starlette.middleware.cors import CORSMiddleware
@@ -11,14 +11,18 @@ from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict, EmailStr
 from typing import List, Optional
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from passlib.context import CryptContext
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from passlib.context import CryptContext
+from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+from typing import List, Optional, Dict, Any
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/organizer/login")
 
 import requests  # <-- added for URL image download
 
@@ -31,22 +35,28 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+# JWT Authentication Config
+SECRET_KEY = os.environ.get("SECRET_KEY", "fallback-secret-key-for-development")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
+
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # Create the main app without a prefix
 app = FastAPI()
-origins = [
-    "https://my-jewellery.vercel.app",
-]
 
-# app.add_middleware(
-#     CORSMiddleware,
-#     allow_origins=origins,
-#     allow_credentials=True,
-#     allow_methods=["*"],
-#     allow_headers=["*"],
-# )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://my-jewellery.vercel.app"
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
@@ -172,6 +182,35 @@ class ImageUrlRequest(BaseModel):
 
 # ============ UTILITY FUNCTIONS ============
 
+def create_access_token(data: dict, expires_delta: Optional[int] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.now(timezone.utc) + expires_delta
+    else:
+        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+async def get_current_organizer(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=401,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email: str = payload.get("sub")
+        if email is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+        
+    organizer = await db.organizers.find_one({"email": email}, {"_id": 0})
+    if organizer is None:
+        raise credentials_exception
+    return organizer
+
 def calculate_price(metal_type: str, purity: str, weight: float, rates: dict):
     """Calculate total price with breakdown"""
     # Get metal rate
@@ -236,7 +275,7 @@ async def get_metal_rates():
     return MetalRate(**rates)
 
 @api_router.put("/metal-rates", response_model=MetalRate)
-async def update_metal_rates(rates_update: MetalRateUpdate):
+async def update_metal_rates(rates_update: MetalRateUpdate, current_organizer: dict = Depends(get_current_organizer)):
     """Update metal rates (admin only)"""
     new_rates = MetalRate(**rates_update.model_dump())
     doc = new_rates.model_dump()
@@ -250,7 +289,7 @@ UPLOAD_DIR = ROOT_DIR / "uploads"
 UPLOAD_DIR.mkdir(exist_ok=True)
 
 @api_router.post("/upload-by-url")
-async def upload_by_url(payload: ImageUrlRequest):
+async def upload_by_url(payload: ImageUrlRequest, current_organizer: dict = Depends(get_current_organizer)):
     """Download image from a URL and save it on the server"""
     url = payload.url.strip()
 
@@ -279,7 +318,7 @@ async def upload_by_url(payload: ImageUrlRequest):
         raise HTTPException(status_code=500, detail="Error downloading image")
 
 @api_router.post("/upload-by-file")
-async def upload_by_file(file: UploadFile = File(...)):
+async def upload_by_file(file: UploadFile = File(...), current_organizer: dict = Depends(get_current_organizer)):
     """Upload image file (e.g., from gallery) and save it on the server"""
     try:
         contents = await file.read()
@@ -303,7 +342,7 @@ async def upload_by_file(file: UploadFile = File(...)):
 # ============ PRODUCT ROUTES ============
 
 @api_router.post("/products", response_model=Product)
-async def create_product(product: ProductCreate):
+async def create_product(product: ProductCreate, current_organizer: dict = Depends(get_current_organizer)):
     """Create new product"""
     product_obj = Product(**product.model_dump())
     doc = product_obj.model_dump()
@@ -393,7 +432,7 @@ async def get_product(product_id: str):
     return Product(**product)
 
 @api_router.put("/products/{product_id}", response_model=Product)
-async def update_product(product_id: str, product_update: ProductUpdate):
+async def update_product(product_id: str, product_update: ProductUpdate, current_organizer: dict = Depends(get_current_organizer)):
     """Update product"""
     update_data = {k: v for k, v in product_update.model_dump().items() if v is not None}
     update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
@@ -415,7 +454,7 @@ async def update_product(product_id: str, product_update: ProductUpdate):
     return Product(**updated_product)
 
 @api_router.delete("/products/{product_id}")
-async def delete_product(product_id: str):
+async def delete_product(product_id: str, current_organizer: dict = Depends(get_current_organizer)):
     """Delete product"""
     result = await db.products.delete_one({"id": product_id})
     if result.deleted_count == 0:
@@ -511,7 +550,7 @@ async def get_testimonials(approved_only: bool = True):
     return testimonials
 
 @api_router.put("/testimonials/{testimonial_id}/approve")
-async def approve_testimonial(testimonial_id: str):
+async def approve_testimonial(testimonial_id: str, current_organizer: dict = Depends(get_current_organizer)):
     """Approve testimonial"""
     result = await db.testimonials.update_one(
         {"id": testimonial_id},
@@ -576,10 +615,16 @@ async def organizer_login(login: OrganizerLogin):
                 "created_at": datetime.now(timezone.utc).isoformat()
             }
             await db.organizers.insert_one(default_organizer)
+            access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+            access_token = create_access_token(
+                data={"sub": default_organizer["email"]}, expires_delta=access_token_expires
+            )
             return {
                 "success": True,
                 "must_change_password": True,
-                "email": login.email
+                "email": login.email,
+                "access_token": access_token,
+                "token_type": "bearer"
             }
         else:
             raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -596,14 +641,22 @@ async def organizer_login(login: OrganizerLogin):
         "timestamp": datetime.now(timezone.utc).isoformat()
     })
     
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": organizer["email"]}, expires_delta=access_token_expires
+    )
+    
     return {
         "success": True,
         "must_change_password": organizer.get('must_change_password', False),
-        "email": login.email
+        "email": login.email,
+        "access_token": access_token,
+        "token_type": "bearer"
     }
 
 @api_router.post("/organizer/change-password")
-async def change_password(email: str, password_change: OrganizerPasswordChange):
+async def change_password(password_change: OrganizerPasswordChange, current_organizer: dict = Depends(get_current_organizer)):
+    email = current_organizer["email"]
     """Change organizer password"""
     organizer = await db.organizers.find_one({"email": email}, {"_id": 0})
     if not organizer:
@@ -623,7 +676,7 @@ async def change_password(email: str, password_change: OrganizerPasswordChange):
     return {"message": "Password changed successfully"}
 
 @api_router.get("/organizer/analytics")
-async def get_analytics():
+async def get_analytics(current_organizer: dict = Depends(get_current_organizer)):
     """Get dashboard analytics"""
     total_products = await db.products.count_documents({})
     total_enquiries = await db.enquiries.count_documents({})
@@ -649,17 +702,6 @@ async def root():
 # Include the router in the main app
 app.include_router(api_router)
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://my-jewellery.vercel.app"
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # Configure logging
 logging.basicConfig(

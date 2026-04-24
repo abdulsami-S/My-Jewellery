@@ -72,6 +72,48 @@ export default function OrganizerDashboard() {
   const [imageFile, setImageFile] = useState(null); // gallery file
   const [uploadingImage, setUploadingImage] = useState(false);
 
+  const handleLogout = () => {
+    localStorage.removeItem("organizer_token");
+    setIsLoggedIn(false);
+    setEmail("");
+    setPassword("");
+    setAnalytics(null);
+    navigate("/");
+  };
+
+  useEffect(() => {
+    // Setup axios interceptors for JWT
+    const requestInterceptor = axios.interceptors.request.use((config) => {
+      const token = localStorage.getItem("organizer_token");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    });
+
+    const responseInterceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response && error.response.status === 401) {
+          localStorage.removeItem("organizer_token");
+          setIsLoggedIn(false);
+          toast.error("Session expired, please login again");
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    // Auto-login if token exists
+    if (localStorage.getItem("organizer_token")) {
+      setIsLoggedIn(true);
+    }
+
+    return () => {
+      axios.interceptors.request.eject(requestInterceptor);
+      axios.interceptors.response.eject(responseInterceptor);
+    };
+  }, []);
+
   useEffect(() => {
     if (isLoggedIn) {
       fetchDashboardData();
@@ -112,6 +154,7 @@ export default function OrganizerDashboard() {
         password,
       });
       if (response.status === 200) {
+        localStorage.setItem("organizer_token", response.data.access_token);
         setIsLoggedIn(true);
         setMustChangePassword(response.data.must_change_password);
         toast.success("Login successful!");
@@ -124,7 +167,7 @@ export default function OrganizerDashboard() {
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     try {
-      await axios.post(`${API}/organizer/change-password?email=${email}`, {
+      await axios.post(`${API}/organizer/change-password`, {
         old_password: oldPassword,
         new_password: newPassword,
       });
@@ -398,10 +441,7 @@ export default function OrganizerDashboard() {
           </h1>
           <Button
             variant="ghost"
-            onClick={() => {
-              setIsLoggedIn(false);
-              navigate("/");
-            }}
+            onClick={handleLogout}
             data-testid="logout-btn"
           >
             <LogOut className="w-5 h-5 mr-2" />
