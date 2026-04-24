@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, Depends
+from fastapi import FastAPI, APIRouter, HTTPException, UploadFile, File, Form, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 # from starlette.middleware.cors import CORSMiddleware
@@ -20,7 +20,9 @@ from passlib.context import CryptContext
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from typing import List, Optional, Dict, Any
-
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/organizer/login")
 
@@ -58,6 +60,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
@@ -69,18 +75,18 @@ logger = logging.getLogger(__name__)
 class MetalRate(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    gold_22k: float
-    gold_24k: float
-    silver_999: float
-    diamond_per_carat: float
+    gold_22k: float = Field(..., gt=0, description="Gold 22K rate must be a positive number")
+    gold_24k: float = Field(..., gt=0, description="Gold 24K rate must be a positive number")
+    silver_999: float = Field(..., gt=0, description="Silver 999 rate must be a positive number")
+    diamond_per_carat: float = Field(..., gt=0, description="Diamond rate must be a positive number")
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_by: str = "admin"
 
 class MetalRateUpdate(BaseModel):
-    gold_22k: float
-    gold_24k: float
-    silver_999: float
-    diamond_per_carat: float
+    gold_22k: float = Field(..., gt=0, description="Gold 22K rate must be a positive number")
+    gold_24k: float = Field(..., gt=0, description="Gold 24K rate must be a positive number")
+    silver_999: float = Field(..., gt=0, description="Silver 999 rate must be a positive number")
+    diamond_per_carat: float = Field(..., gt=0, description="Diamond rate must be a positive number")
 
 class ProductImage(BaseModel):
     url: str
@@ -90,39 +96,42 @@ class ProductImage(BaseModel):
 class Product(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    description: str
-    metal_type: str  # Gold, Silver, Diamond
-    purity: str  # 18K, 22K, 24K, 925, etc
-    weight: float  # in grams or carats
+    name: str = Field(..., min_length=1, description="Product name is required")
+    description: str = Field(..., min_length=1, description="Product description is required")
+    metal_type: str = Field(..., min_length=1, description="Metal type is required")
+    purity: str = Field(..., min_length=1, description="Purity is required")
+    weight: float = Field(..., gt=0, description="Weight must be a positive number")
+    making_charges: float = Field(default=0.0, ge=0, description="Making charges cannot be negative")
     dimensions: Optional[str] = None
-    category: str  # Men, Women, Kids
-    occasion: str  # Daily Wear, Wedding, Festive, Gifting
+    category: str = Field(..., min_length=1, description="Category is required")
+    occasion: str = Field(..., min_length=1)
     images: List[ProductImage] = []
     view_count: int = 0
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class ProductCreate(BaseModel):
-    name: str
-    description: str
-    metal_type: str
-    purity: str
-    weight: float
+    name: str = Field(..., min_length=1, description="Product name is required")
+    description: str = Field(..., min_length=1, description="Product description is required")
+    metal_type: str = Field(..., min_length=1, description="Metal type is required")
+    purity: str = Field(..., min_length=1, description="Purity is required")
+    weight: float = Field(..., gt=0, description="Weight must be a positive number")
+    making_charges: float = Field(..., ge=0, description="Making charges cannot be negative")
     dimensions: Optional[str] = None
-    category: str
-    occasion: str
+    category: str = Field(..., min_length=1, description="Category is required")
+    occasion: str = Field(..., min_length=1)
     images: List[ProductImage] = []
 
 class ProductUpdate(BaseModel):
-    name: Optional[str] = None
-    description: Optional[str] = None
-    metal_type: Optional[str] = None
-    purity: Optional[str] = None
-    weight: Optional[float] = None
+    name: Optional[str] = Field(None, min_length=1, description="Product name must not be empty")
+    description: Optional[str] = Field(None, min_length=1, description="Product description must not be empty")
+    metal_type: Optional[str] = Field(None, min_length=1, description="Metal type must not be empty")
+    purity: Optional[str] = Field(None, min_length=1, description="Purity must not be empty")
+    weight: Optional[float] = Field(None, gt=0, description="Weight must be a positive number")
+    making_charges: Optional[float] = Field(None, ge=0, description="Making charges cannot be negative")
     dimensions: Optional[str] = None
-    category: Optional[str] = None
-    occasion: Optional[str] = None
+    category: Optional[str] = Field(None, min_length=1, description="Category must not be empty")
+    occasion: Optional[str] = Field(None, min_length=1)
     images: Optional[List[ProductImage]] = None
 
 class Testimonial(BaseModel):
@@ -144,27 +153,27 @@ class TestimonialCreate(BaseModel):
 class Enquiry(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    name: str
-    email: EmailStr
-    phone: str
-    message: str
-    enquiry_type: str  # Custom Design, General, Appointment
+    name: str = Field(..., min_length=1, description="Name is required")
+    email: EmailStr = Field(..., description="A valid email is required")
+    phone: str = Field(..., min_length=1, description="Phone number is required")
+    message: str = Field(..., min_length=1, description="Message is required")
+    enquiry_type: str = Field(..., min_length=1, description="Enquiry type is required")
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
 class EnquiryCreate(BaseModel):
-    name: str
-    email: EmailStr
-    phone: str
-    message: str
-    enquiry_type: str
+    name: str = Field(..., min_length=1, description="Name is required")
+    email: EmailStr = Field(..., description="A valid email is required")
+    phone: str = Field(..., min_length=1, description="Phone number is required")
+    message: str = Field(..., min_length=1, description="Message is required")
+    enquiry_type: str = Field(..., min_length=1, description="Enquiry type is required")
 
 class OrganizerLogin(BaseModel):
-    email: str
-    password: str
+    email: str = Field(..., min_length=3, description="Username/Email must be at least 3 characters")
+    password: str = Field(..., min_length=3, description="Password must be at least 3 characters")
 
 class OrganizerPasswordChange(BaseModel):
-    old_password: str
-    new_password: str
+    old_password: str = Field(..., min_length=3)
+    new_password: str = Field(..., min_length=3)
 
 class VisitorLog(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -211,7 +220,7 @@ async def get_current_organizer(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return organizer
 
-def calculate_price(metal_type: str, purity: str, weight: float, rates: dict):
+def calculate_price(metal_type: str, purity: str, weight: float, rates: dict, making_charges_override: float = 0.0):
     """Calculate total price with breakdown"""
     # Get metal rate
     if metal_type.lower() == "gold":
@@ -227,7 +236,11 @@ def calculate_price(metal_type: str, purity: str, weight: float, rates: dict):
         rate = rates.get("diamond_per_carat", 0)
     
     metal_value = rate * weight
-    making_charges = metal_value * 0.10  # 10% of metal value
+    if making_charges_override is not None and making_charges_override > 0:
+        making_charges = making_charges_override
+    else:
+        making_charges = metal_value * 0.10  # 10% of metal value fallback
+        
     gst_on_metal = metal_value * 0.03  # 3% GST on metal
     gst_on_making = making_charges * 0.05  # 5% GST on making
     total_price = metal_value + making_charges + gst_on_metal + gst_on_making
@@ -407,7 +420,8 @@ async def get_products(
                 product['metal_type'],
                 product['purity'],
                 product['weight'],
-                rates
+                rates,
+                product.get('making_charges', 0.0)
             )
             total_price = price_info['total_price']
             if (min_price is None or total_price >= min_price) and \
@@ -481,7 +495,8 @@ async def get_product_price(product_id: str):
         product['metal_type'],
         product['purity'],
         product['weight'],
-        rates
+        rates,
+        product.get('making_charges', 0.0)
     )
     
     return {
@@ -563,7 +578,8 @@ async def approve_testimonial(testimonial_id: str, current_organizer: dict = Dep
 # ============ ENQUIRIES ============
 
 @api_router.post("/enquiries", response_model=Enquiry)
-async def create_enquiry(enquiry: EnquiryCreate):
+@limiter.limit("10/minute")
+async def create_enquiry(request: Request, enquiry: EnquiryCreate):
     """Create new enquiry"""
     enquiry_obj = Enquiry(**enquiry.model_dump())
     doc = enquiry_obj.model_dump()
@@ -598,7 +614,8 @@ async def get_enquiries():
 # ============ ORGANIZER AUTH ============
 
 @api_router.post("/organizer/login")
-async def organizer_login(login: OrganizerLogin):
+@limiter.limit("5/minute")
+async def organizer_login(request: Request, login: OrganizerLogin):
     """Organizer login"""
     # Check if organizer exists
     organizer = await db.organizers.find_one({"email": login.email}, {"_id": 0})
