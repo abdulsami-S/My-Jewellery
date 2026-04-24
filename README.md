@@ -289,12 +289,18 @@ python -m pytest tests/
 | Method | Endpoint | What it does |
 |--------|----------|--------------|
 | `GET` | `/api/products` | Get all jewellery products |
+| `POST` | `/api/products` | Add a new product (Admin) |
+| `PUT` | `/api/products/{id}` | Update product details (Admin) |
+| `DELETE` | `/api/products/{id}` | Remove a product (Admin) |
 | `GET` | `/api/products/{id}/price` | Get full price breakdown for a product |
 | `GET` | `/api/metal-rates` | Get today's gold/silver/diamond rates |
+| `PUT` | `/api/metal-rates` | Update metal rates (Admin) |
 | `GET` | `/api/bestsellers` | Get top products by popularity |
 | `POST` | `/api/enquiries` | Submit a customer enquiry |
+| `GET` | `/api/enquiries` | View all customer enquiries (Admin) |
 | `POST` | `/api/organizer/login` | Admin login |
-| `PUT` | `/api/metal-rates` | Update metal rates (admin) |
+| `GET` | `/api/organizer/analytics` | Get dashboard statistics (Admin) |
+| `GET` | `/api/testimonials` | Get approved testimonials |
 
 ---
 
