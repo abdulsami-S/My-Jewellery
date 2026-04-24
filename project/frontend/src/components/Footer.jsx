@@ -5,7 +5,7 @@ import { Facebook, Instagram, Mail, Phone, MapPin } from "lucide-react";
 export default function Footer() {
   return (
     // <footer className="bg-gradient-to-br from-amber-900 to-amber-950 text-white" data-testid="main-footer">
-      <footer style={{ backgroundColor: '#5a3d2b' }} className="text-white" data-testid="main-footer">
+    <footer style={{ backgroundColor: '#5a3d2b' }} className="text-white" data-testid="main-footer">
       <div className="max-w-7xl mx-auto px-4 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* About */}
@@ -17,7 +17,7 @@ export default function Footer() {
               Crafting timeless treasures since 1995. Where tradition meets elegance.
             </p>
             <div className="flex space-x-4">
-              <a href="https://instagram.com/dgm_jewellerss" target="_blank" rel="noopener noreferrer" data-testid="instagram-link">
+              <a href="https://instagram.com/sam__jewellerss" target="_blank" rel="noopener noreferrer" data-testid="instagram-link">
                 <Instagram className="w-6 h-6 hover:text-amber-300 transition-colors" />
               </a>
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" data-testid="facebook-link">
